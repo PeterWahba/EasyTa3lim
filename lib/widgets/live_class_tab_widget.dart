@@ -1,19 +1,20 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
 import 'dart:convert';
+
 import 'package:academy_app/models/live_class_model.dart';
 import 'package:academy_app/providers/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../constants.dart';
 import 'custom_text.dart';
-import 'package:http/http.dart' as http;
 
 class LiveClassTabWidget extends StatefulWidget {
   final int courseId;
-  const LiveClassTabWidget({Key? key, required this.courseId})
-      : super(key: key);
+  const LiveClassTabWidget({Key? key, required this.courseId}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -27,8 +28,7 @@ class _LiveClassTabWidgetState extends State<LiveClassTabWidget> {
 
   Future<LiveClassModel> fetchLiveClassModel() async {
     token = await SharedPreferenceHelper().getAuthToken();
-    var url =
-        '$BASE_URL/api/zoom_live_class?course_id=${widget.courseId}&auth_token=$token';
+    var url = '$BASE_URL/api/zoom_live_class?course_id=${widget.courseId}&auth_token=$token';
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -62,14 +62,12 @@ class _LiveClassTabWidgetState extends State<LiveClassTabWidget> {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 20.0, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15),
                   child: Container(
                     width: double.infinity,
                     color: kNoteColor,
                     child: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text(
                         'No live class is scheduled to this course yet. Please come back later.',
                         textAlign: TextAlign.center,
@@ -85,9 +83,7 @@ class _LiveClassTabWidgetState extends State<LiveClassTabWidget> {
               ],
             );
           } else {
-            var dt = DateTime.fromMillisecondsSinceEpoch(int.parse(
-                    dataSnapshot.data!.zoomLiveClassDetails!.time.toString()) *
-                1000);
+            var dt = DateTime.fromMillisecondsSinceEpoch(int.parse(dataSnapshot.data!.zoomLiveClassDetails!.time.toString()) * 1000);
             // 12 Hour format:
             var date = DateFormat('hh:mm a : E, dd MMM yyyy').format(dt);
             return Column(
@@ -120,17 +116,14 @@ class _LiveClassTabWidgetState extends State<LiveClassTabWidget> {
                   // fontWeight: FontWeight.bold,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 20.0, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15),
                   child: Container(
                     width: double.infinity,
                     color: kNoteColor,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                       child: Text(
-                        dataSnapshot.data!.zoomLiveClassDetails!.noteToStudents
-                            .toString(),
+                        dataSnapshot.data!.zoomLiveClassDetails!.noteToStudents.toString(),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 15,
@@ -154,7 +147,7 @@ class _LiveClassTabWidgetState extends State<LiveClassTabWidget> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(7.0),
                     ),
-                    primary: kPrimaryColor,
+                    // primary: kPrimaryColor,
                   ),
                   icon: const Icon(
                     Icons.videocam_rounded,
