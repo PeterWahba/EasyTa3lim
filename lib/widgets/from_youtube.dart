@@ -1,21 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
+
+import 'package:academy_app/providers/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:pod_player/pod_player.dart';
 import 'package:provider/provider.dart';
+
 import '../constants.dart';
 import '../providers/my_courses.dart';
 import '../providers/shared_pref_helper.dart';
-import 'package:http/http.dart' as http;
 
 class PlayVideoFromYoutube extends StatefulWidget {
   static const routeName = '/fromVimeoId';
   final int courseId;
   final int? lessonId;
   final String videoUrl;
-  const PlayVideoFromYoutube(
-      {Key? key, required this.courseId, this.lessonId, required this.videoUrl})
-      : super(key: key);
+
+  const PlayVideoFromYoutube({Key? key, required this.courseId, this.lessonId, required this.videoUrl}) : super(key: key);
 
   @override
   State<PlayVideoFromYoutube> createState() => _PlayVideoFromVimeoIdState();
@@ -39,8 +41,7 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
     super.initState();
 
     if (widget.lessonId != null) {
-      timer = Timer.periodic(
-          const Duration(seconds: 5), (Timer t) => updateWatchHistory());
+      timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => updateWatchHistory());
     }
   }
 
@@ -58,8 +59,7 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
             body: {
               'course_id': widget.courseId.toString(),
               'lesson_id': widget.lessonId.toString(),
-              'current_duration':
-                  controller.currentVideoPosition.inSeconds.toString(),
+              'current_duration': controller.currentVideoPosition.inSeconds.toString(),
             },
           );
 
@@ -71,11 +71,7 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
             var isCompleted = responseData['is_completed'];
             if (isCompleted == 1) {
               // ignore: use_build_context_synchronously
-              Provider.of<MyCourses>(context, listen: false)
-                  .updateDripContendLesson(
-                      widget.courseId,
-                      responseData['course_progress'],
-                      responseData['number_of_completed_lessons']);
+              Provider.of<MyCourses>(context, listen: false).updateDripContendLesson(widget.courseId, responseData['course_progress'], responseData['number_of_completed_lessons']);
             }
           }
         } catch (error) {
@@ -109,8 +105,25 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
       ),
       body: SafeArea(
         child: Center(
-          child: PodVideoPlayer(
-            controller: controller,
+          child: Stack(
+            children: [
+              PodVideoPlayer(
+                controller: controller,
+              ),
+              Center(
+                  child: Transform.rotate(
+                      angle: -0.45,
+                      child: IgnorePointer(
+                          child: Opacity(
+                              opacity: 0.2,
+                              child: FittedBox(
+                                child: Text(
+                                  "${context.read<Auth>().user.email}",
+                                  style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ))))),
+            ],
           ),
         ),
       ),

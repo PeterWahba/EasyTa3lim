@@ -1,5 +1,7 @@
-import 'package:pod_player/pod_player.dart';
+import 'package:academy_app/providers/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pod_player/pod_player.dart';
+import 'package:provider/provider.dart';
 
 import '../constants.dart';
 
@@ -38,23 +40,40 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromAsset> {
       ),
       backgroundColor: kBackgroundColor,
       body: Center(
-        child: PodVideoPlayer(
-          controller: controller,
-          podPlayerLabels: const PodPlayerLabels(
-            play: "PLAY",
-            pause: "PAUSE",
-            error: "ERROR WHILE TRYING TO PLAY VIDEO",
-            exitFullScreen: "EXIT FULL SCREEN",
-            fullscreen: "FULL SCREEN",
-            loopVideo: "LOOP VIDEO",
-            mute: "MUTE",
-            playbackSpeed: "PLAYBACK SPEED",
-            settings: "SETTINGS",
-            unmute: "UNMUTE",
-            optionEnabled: "YES",
-            optionDisabled: "NO",
-            quality: "QUALITY",
-          ),
+        child: Stack(
+          children: [
+            PodVideoPlayer(
+              controller: controller,
+              podPlayerLabels: const PodPlayerLabels(
+                play: "PLAY",
+                pause: "PAUSE",
+                error: "ERROR WHILE TRYING TO PLAY VIDEO",
+                exitFullScreen: "EXIT FULL SCREEN",
+                fullscreen: "FULL SCREEN",
+                loopVideo: "LOOP VIDEO",
+                mute: "MUTE",
+                playbackSpeed: "PLAYBACK SPEED",
+                settings: "SETTINGS",
+                unmute: "UNMUTE",
+                optionEnabled: "YES",
+                optionDisabled: "NO",
+                quality: "QUALITY",
+              ),
+            ),
+            Center(
+                child: Transform.rotate(
+                    angle: -0.45,
+                    child: IgnorePointer(
+                        child: Opacity(
+                            opacity: 0.2,
+                            child: FittedBox(
+                              child: Text(
+                                "${context.read<Auth>().user.email}",
+                                style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.center,
+                              ),
+                            ))))),
+          ],
         ),
       ),
     );

@@ -2,23 +2,24 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:pod_player/pod_player.dart';
+
+import 'package:academy_app/providers/auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:pod_player/pod_player.dart';
 import 'package:provider/provider.dart';
+
 import '../constants.dart';
 import '../providers/my_courses.dart';
 import '../providers/shared_pref_helper.dart';
-import 'package:http/http.dart' as http;
 
 class PlayVideoFromNetwork extends StatefulWidget {
   static const routeName = '/fromNetwork';
   final int courseId;
   final int? lessonId;
   final String videoUrl;
-  const PlayVideoFromNetwork(
-      {Key? key, required this.courseId, this.lessonId, required this.videoUrl})
-      : super(key: key);
+  const PlayVideoFromNetwork({Key? key, required this.courseId, this.lessonId, required this.videoUrl}) : super(key: key);
 
   @override
   State<PlayVideoFromNetwork> createState() => _PlayVideoFromAssetState();
@@ -48,8 +49,7 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
     super.initState();
 
     if (widget.lessonId != null) {
-      timer = Timer.periodic(
-          const Duration(seconds: 5), (Timer t) => updateWatchHistory());
+      timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => updateWatchHistory());
     }
   }
 
@@ -67,8 +67,7 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
             body: {
               'course_id': widget.courseId.toString(),
               'lesson_id': widget.lessonId.toString(),
-              'current_duration':
-                  controller.currentVideoPosition.inSeconds.toString(),
+              'current_duration': controller.currentVideoPosition.inSeconds.toString(),
             },
           );
 
@@ -79,11 +78,7 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
           } else {
             var isCompleted = responseData['is_completed'];
             if (isCompleted == 1) {
-              Provider.of<MyCourses>(context, listen: false)
-                  .updateDripContendLesson(
-                      widget.courseId,
-                      responseData['course_progress'],
-                      responseData['number_of_completed_lessons']);
+              Provider.of<MyCourses>(context, listen: false).updateDripContendLesson(widget.courseId, responseData['course_progress'], responseData['number_of_completed_lessons']);
             }
           }
         } catch (error) {
@@ -117,20 +112,37 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
       backgroundColor: kBackgroundColor,
       body: SafeArea(
         child: Center(
-          child: PodVideoPlayer(
-            controller: controller,
-            podProgressBarConfig: const PodProgressBarConfig(
-              padding: kIsWeb
-                  ? EdgeInsets.zero
-                  : EdgeInsets.only(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
-                    ),
-              playingBarColor: Colors.blue,
-              circleHandlerColor: Colors.blue,
-              backgroundColor: Colors.blueGrey,
-            ),
+          child: Stack(
+            children: [
+              PodVideoPlayer(
+                controller: controller,
+                podProgressBarConfig: const PodProgressBarConfig(
+                  padding: kIsWeb
+                      ? EdgeInsets.zero
+                      : EdgeInsets.only(
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                        ),
+                  playingBarColor: Colors.blue,
+                  circleHandlerColor: Colors.blue,
+                  backgroundColor: Colors.blueGrey,
+                ),
+              ),
+              Center(
+                  child: Transform.rotate(
+                      angle: -0.45,
+                      child: IgnorePointer(
+                          child: Opacity(
+                              opacity: 0.2,
+                              child: FittedBox(
+                                child: Text(
+                                  "${context.read<Auth>().user.email}",
+                                  style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ))))),
+            ],
           ),
         ),
       ),
