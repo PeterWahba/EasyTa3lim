@@ -14,6 +14,7 @@ import 'device_verifcation.dart';
 
 class AuthScreen extends StatefulWidget {
   static const routeName = '/auth';
+
   const AuthScreen({Key? key}) : super(key: key);
 
   @override
@@ -95,23 +96,24 @@ class _AuthScreenState extends State<AuthScreen> {
       _isLoading = true;
     });
 
-    await Provider.of<Auth>(context, listen: false).login(
+    await Provider.of<Auth>(context, listen: false)
+        .login(
       _authData['email'].toString(),
       _authData['password'].toString(),
-    ).then((_) {
+    )
+        .then((_) {
       setState(() {
         _isLoading = false;
         userDetails = Provider.of<Auth>(context, listen: false).user;
       });
     });
 
-    if(userDetails.validity == 1){
-      if(userDetails.deviceVerification == 'needed-verification') {
-        Navigator.of(context).pushNamed(DeviceVerificationScreen.routeName,
-          arguments: {
-            'email': userDetails.email,
-            'token': userDetails.token, // Replace with the actual token value
-          });
+    if (userDetails.validity == 1) {
+      if (userDetails.deviceVerification == 'needed-verification') {
+        Navigator.of(context).pushNamed(DeviceVerificationScreen.routeName, arguments: {
+          'email': userDetails.email,
+          'token': userDetails.token, // Replace with the actual token value
+        });
         CommonFunctions.showSuccessToast(
           userDetails.deviceVerification!.capitalize(),
         );
@@ -190,8 +192,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 15.0, top: 0.0, right: 15.0, bottom: 8.0),
+                          padding: const EdgeInsets.only(left: 15.0, top: 0.0, right: 15.0, bottom: 8.0),
                           child: TextFormField(
                             style: const TextStyle(fontSize: 14),
                             decoration: getInputDecoration(
@@ -200,11 +201,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (input) =>
-                                !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                                        .hasMatch(input!)
-                                    ? "Email Id should be valid"
-                                    : null,
+                            validator: (input) => !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?").hasMatch(input!) ? "Email Id should be valid" : null,
                             onSaved: (value) {
                               _authData['email'] = value.toString();
                               _emailController.text = value as String;
@@ -226,8 +223,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 15.0, top: 0.0, right: 15.0, bottom: 4.0),
+                          padding: const EdgeInsets.only(left: 15.0, top: 0.0, right: 15.0, bottom: 4.0),
                           child: TextFormField(
                             style: const TextStyle(color: Colors.black),
                             keyboardType: TextInputType.text,
@@ -236,22 +232,16 @@ class _AuthScreenState extends State<AuthScreen> {
                               _authData['password'] = input.toString();
                               _passwordController.text = input as String;
                             },
-                            validator: (input) => input!.length < 3
-                                ? "Password should be more than 3 characters"
-                                : null,
+                            validator: (input) => input!.length < 3 ? "Password should be more than 3 characters" : null,
                             obscureText: hidePassword,
                             decoration: InputDecoration(
                               enabledBorder: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                borderSide: BorderSide(color: Colors.white, width: 2),
                               ),
                               focusedBorder: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(12.0)),
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                                borderSide: BorderSide(color: Colors.white, width: 2),
                               ),
                               border: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
@@ -260,12 +250,10 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               ),
                               filled: true,
-                              hintStyle: const TextStyle(
-                                  color: Colors.black54, fontSize: 14),
+                              hintStyle: const TextStyle(color: Colors.black54, fontSize: 14),
                               hintText: "password",
                               fillColor: kBackgroundColor,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 18, horizontal: 15),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 15),
                               prefixIcon: const Icon(
                                 Icons.lock_outlined,
                                 color: kTextLowBlackColor,
@@ -277,21 +265,17 @@ class _AuthScreenState extends State<AuthScreen> {
                                   });
                                 },
                                 color: kTextLowBlackColor,
-                                icon: Icon(hidePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined),
+                                icon: Icon(hidePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                               ),
                             ),
                           ),
                         ),
                         InkWell(
                           onTap: () {
-                            Navigator.of(context)
-                                .pushNamed(ForgotPassword.routeName);
+                            Navigator.of(context).pushNamed(ForgotPassword.routeName);
                           },
                           child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Text(
@@ -311,16 +295,13 @@ class _AuthScreenState extends State<AuthScreen> {
                                     elevation: 0,
                                     color: kPrimaryColor,
                                     onPressed: _submit,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 16),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadiusDirectional.circular(10),
+                                      borderRadius: BorderRadiusDirectional.circular(10),
                                       // side: const BorderSide(color: kPrimaryColor),
                                     ),
                                     child: const Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Log In',

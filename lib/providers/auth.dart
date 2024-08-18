@@ -1,19 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:academy_app/models/user.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import '../constants.dart';
-import 'shared_pref_helper.dart';
+import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants.dart';
+import 'shared_pref_helper.dart';
 
 class Auth with ChangeNotifier {
   String? _token;
   String? _userId;
-  final User _user =
-      User(userId: '', firstName: '', lastName: '', email: '', role: '', validity: '', deviceVerification: '', token: '');
+  final User _user = User(userId: '', firstName: '', lastName: '', email: '', role: '', validity: '', deviceVerification: '', token: '');
 
   String? get token {
     if (_token != null) {
@@ -34,7 +37,10 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
-    var url = '$BASE_URL/api/login?email=$email&password=$password';
+    final deviceId = base64.encode(utf8.encode((await MobileDeviceIdentifier().getDeviceId())!));
+    String udid = await FlutterUdid.consistentUdid;
+
+    var url = '$BASE_URL/api/login?email=$email&password=$password&deviceid=$deviceId&udid=$udid';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -66,7 +72,6 @@ class Auth with ChangeNotifier {
             'user': jsonEncode(_user),
           });
           prefs.setString('userData', userData);
-          
         }
       } else {
         _user.validity = responseData['validity'];
@@ -89,13 +94,12 @@ class Auth with ChangeNotifier {
       // _user = loadedUser;
 
       notifyListeners();
-      
+
       // print(userData);
     } catch (error) {
       rethrow;
     }
   }
-
 
   // Future<void> login(String email, String password) async {
   //   var url = '$BASE_URL/api/login?email=$email&password=$password';
@@ -174,9 +178,7 @@ class Auth with ChangeNotifier {
     var request = http.MultipartRequest('POST', uri);
     request.fields['auth_token'] = token!;
 
-    request.files.add(http.MultipartFile(
-        'file', image.readAsBytes().asStream(), image.lengthSync(),
-        filename: basename(image.path)));
+    request.files.add(http.MultipartFile('file', image.readAsBytes().asStream(), image.lengthSync(), filename: basename(image.path)));
 
     try {
       var response = await request.send();
@@ -243,8 +245,7 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> updateUserPassword(
-      String currentPassword, String newPassword) async {
+  Future<void> updateUserPassword(String currentPassword, String newPassword) async {
     final token = await SharedPreferenceHelper().getAuthToken();
     const url = '$BASE_URL/api/update_password';
     try {
