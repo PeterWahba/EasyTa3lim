@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:academy_app/models/common_functions.dart';
 import 'package:academy_app/models/update_user_model.dart';
+import 'package:academy_app/screens/verification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import 'package:http/http.dart' as http;
@@ -75,16 +76,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         if (user.emailVerification == 'enable') {
           if (user.message == "You have already signed up. Please check your inbox to verify your email address") {
-            // Navigator.of(context).pushNamed(VerificationScreen.routeName, arguments: _emailController.text);
+            Navigator.of(context).pushNamed(VerificationScreen.routeName, arguments: _emailController.text);
             CommonFunctions.showSuccessToast(user.message.toString());
           } else {
-            // Navigator.of(context).pushNamed(VerificationScreen.routeName, arguments: _emailController.text);
+            Navigator.of(context).pushNamed(VerificationScreen.routeName, arguments: _emailController.text);
             CommonFunctions.showSuccessToast(
               user.message.toString(),
             );
           }
         } else {
-          // Navigator.of(context).pushNamed(AuthScreen.routeName);
+          Navigator.of(context).pushNamed(AuthScreen.routeName);
           CommonFunctions.showSuccessToast('Signup Successful');
         }
       }
