@@ -8,8 +8,10 @@ import 'package:academy_app/screens/auth_screen_private.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 import 'package:provider/provider.dart';
+import 'package:screenshot_callback/screenshot_callback.dart';
 
 import '../providers/shared_pref_helper.dart';
 import 'tabs_screen.dart';
@@ -23,6 +25,20 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   dynamic courseAccessibility;
+
+  void callInitScreenShotCallBack() async {
+    await initScreenshotCallback();
+  }
+
+  //It must be created after permission is granted.
+  Future<void> initScreenshotCallback() async {
+    ScreenshotCallback screenshotCallback = ScreenshotCallback();
+
+    screenshotCallback.addListener(() async {
+      String msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
+      print(msg);
+    });
+  }
 
   systemSettings() async {
     var url = "$BASE_URL/api/system_settings";
