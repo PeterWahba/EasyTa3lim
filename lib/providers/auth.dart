@@ -139,6 +139,24 @@ class Auth with ChangeNotifier {
   //     rethrow;
   //   }
   // }
+  Future<void> getLocalUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    var localUserData = (prefs.getString('userData') ?? '');
+    var responseData = json.decode(localUserData);
+    var userData = jsonDecode(responseData['user']);
+    _user.userId = userData['userId'];
+    _user.firstName = userData['firstName'];
+    _user.lastName = userData['lastName'];
+    _user.email = userData['email'];
+    _user.role = userData['role'];
+    _user.validity = userData['validity'];
+    _user.deviceVerification = userData['device_verification'];
+    _user.token = userData['token'];
+
+    _token = responseData['token'];
+    _userId = responseData['user_id'];
+  }
 
   Future<void> getUserInfo() async {
     // final prefs = await SharedPreferences.getInstance();

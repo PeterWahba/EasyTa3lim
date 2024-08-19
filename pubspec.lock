@@ -715,10 +715,11 @@ packages:
   pod_player:
     dependency: "direct main"
     description:
-      name: pod_player
-      sha256: fa8deb5f4f5e705e83b46455d3a0478bb8975f52a0dbc4aff1e13605e689e3c9
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "4a7c0e6a44f4cf8ed112e706941c186cbc678946"
+      resolved-ref: "4a7c0e6a44f4cf8ed112e706941c186cbc678946"
+      url: "https://github.com/sha3rawi33/pod_player/"
+    source: git
     version: "0.2.1"
   provider:
     dependency: "direct main"

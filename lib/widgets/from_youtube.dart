@@ -32,12 +32,35 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
   @override
   void initState() {
     controller = PodPlayerController(
-      playVideoFrom: PlayVideoFrom.youtube(widget.videoUrl),
-      // podPlayerConfig: const PodPlayerConfig(
-      //   videoQualityPriority: [720, 360],
-      //   autoPlay: false,
-      // ),
-    )..initialise();
+        playVideoFrom: PlayVideoFrom.youtube(widget.videoUrl),
+        watermark: Consumer<Auth>(builder: (context, authData, child) {
+          final user = authData.user;
+          print("USER EMAIL IS: ${user.email.toString()} and name is ${user.userId.toString()}");
+          return Center(
+              child: Transform.rotate(
+                  angle: -0.45,
+                  child: IgnorePointer(
+                      child: Opacity(
+                          opacity: 0.2,
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: FittedBox(
+                              child: Text(
+                                overflow: TextOverflow.ellipsis,
+                                user.email!,
+                                style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )))));
+        })
+        // podPlayerConfig: const PodPlayerConfig(
+        //   videoQualityPriority: [720, 360],
+        //   autoPlay: false,
+        // ),
+        )
+      ..initialise();
     super.initState();
 
     if (widget.lessonId != null) {
@@ -105,25 +128,8 @@ class _PlayVideoFromVimeoIdState extends State<PlayVideoFromYoutube> {
       ),
       body: SafeArea(
         child: Center(
-          child: Stack(
-            children: [
-              PodVideoPlayer(
-                controller: controller,
-              ),
-              Center(
-                  child: Transform.rotate(
-                      angle: -0.45,
-                      child: IgnorePointer(
-                          child: Opacity(
-                              opacity: 0.2,
-                              child: FittedBox(
-                                child: Text(
-                                  "${context.read<Auth>().user.email}",
-                                  style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ))))),
-            ],
+          child: PodVideoPlayer(
+            controller: controller,
           ),
         ),
       ),

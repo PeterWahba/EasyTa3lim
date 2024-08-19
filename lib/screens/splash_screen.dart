@@ -73,6 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
       await checkDeviceBinding();
       token = await SharedPreferenceHelper().getAuthToken();
       if (token != null && token!.isNotEmpty) {
+        await Provider.of<Auth>(context, listen: false).getLocalUserInfo();
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const TabsScreen()));
       } else {
         if (courseAccessibility == 'publicly') {

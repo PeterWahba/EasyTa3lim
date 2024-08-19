@@ -54,7 +54,10 @@ dependencies:
   connectivity_plus: ^3.0.3
   html_unescape: ^2.0.0
   universal_html: ^2.0.8
-  pod_player: ^0.2.1
+  pod_player:
+    git:
+        url: https://github.com/sha3rawi33/pod_player/
+        ref: 4a7c0e6a44f4cf8ed112e706941c186cbc678946
   webview_flutter: ^4.0.6
   background_downloader: ^7.10.0
   logging: ^1.2.0

@@ -19,6 +19,7 @@ class PlayVideoFromNetwork extends StatefulWidget {
   final int courseId;
   final int? lessonId;
   final String videoUrl;
+
   const PlayVideoFromNetwork({Key? key, required this.courseId, this.lessonId, required this.videoUrl}) : super(key: key);
 
   @override
@@ -33,19 +34,34 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
   @override
   void initState() {
     controller = PodPlayerController(
-      playVideoFrom: PlayVideoFrom.networkQualityUrls(
-        videoUrls: [
-          VideoQalityUrls(
-            quality: 360,
-            url: widget.videoUrl,
-          ),
-          VideoQalityUrls(
-            quality: 720,
-            url: widget.videoUrl,
-          ),
-        ],
-      ),
-    )..initialise();
+        playVideoFrom: PlayVideoFrom.networkQualityUrls(
+          videoUrls: [
+            VideoQalityUrls(
+              quality: 360,
+              url: widget.videoUrl,
+            ),
+            VideoQalityUrls(
+              quality: 720,
+              url: widget.videoUrl,
+            ),
+          ],
+        ),
+        watermark: Consumer<Auth>(builder: (context, authData, child) {
+          final user = authData.user;
+          return Center(
+              child: Transform.rotate(
+                  angle: -0.45,
+                  child: IgnorePointer(
+                      child: Opacity(
+                          opacity: 0.2,
+                          child: Text(
+                            overflow: TextOverflow.ellipsis,
+                            user.email!,
+                            style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
+                            textAlign: TextAlign.center,
+                          )))));
+        }))
+      ..initialise();
     super.initState();
 
     if (widget.lessonId != null) {
@@ -112,37 +128,20 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromNetwork> {
       backgroundColor: kBackgroundColor,
       body: SafeArea(
         child: Center(
-          child: Stack(
-            children: [
-              PodVideoPlayer(
-                controller: controller,
-                podProgressBarConfig: const PodProgressBarConfig(
-                  padding: kIsWeb
-                      ? EdgeInsets.zero
-                      : EdgeInsets.only(
-                          bottom: 20,
-                          left: 20,
-                          right: 20,
-                        ),
-                  playingBarColor: Colors.blue,
-                  circleHandlerColor: Colors.blue,
-                  backgroundColor: Colors.blueGrey,
-                ),
-              ),
-              Center(
-                  child: Transform.rotate(
-                      angle: -0.45,
-                      child: IgnorePointer(
-                          child: Opacity(
-                              opacity: 0.2,
-                              child: FittedBox(
-                                child: Text(
-                                  "${context.read<Auth>().user.email}",
-                                  style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ))))),
-            ],
+          child: PodVideoPlayer(
+            controller: controller,
+            podProgressBarConfig: const PodProgressBarConfig(
+              padding: kIsWeb
+                  ? EdgeInsets.zero
+                  : EdgeInsets.only(
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                    ),
+              playingBarColor: Colors.blue,
+              circleHandlerColor: Colors.blue,
+              backgroundColor: Colors.blueGrey,
+            ),
           ),
         ),
       ),
