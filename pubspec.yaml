@@ -69,10 +69,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-flutter_icons:
-  android: true
+flutter_launcher_icons:
+  android: false
   ios: true
-  image_path: "assets/images/icon.JPG"    
+  image_path: "assets/images/icon.jpg"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

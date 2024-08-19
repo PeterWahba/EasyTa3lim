@@ -83,7 +83,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
-          title: 'Academy App',
+          title: 'EasyTa3lim',
           theme: ThemeData(
             fontFamily: 'google_sans',
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple)
