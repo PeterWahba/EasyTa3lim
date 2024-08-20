@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
-import '../constants.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:academy_app/providers/shared_pref_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_udid/flutter_udid.dart';
+import 'package:http/http.dart' as http;
+import 'package:mobile_device_identifier/mobile_device_identifier.dart';
+
+import '../constants.dart';
 
 class DifficultyLevel {
   String id;
@@ -38,8 +43,8 @@ class Language {
   int? id;
   String? value;
   String? displayedValue;
-  Language(
-      {@required this.id, @required this.value, @required this.displayedValue});
+
+  Language({@required this.id, @required this.value, @required this.displayedValue});
 }
 
 class Languages with ChangeNotifier {
@@ -74,4 +79,17 @@ class Languages with ChangeNotifier {
       rethrow;
     }
   }
+}
+
+Future<void> sendScreenShotLogs(String message) async {
+  String? authToken = await SharedPreferenceHelper().getAuthToken();
+
+  if (authToken == null || authToken.isEmpty) {
+    authToken = 'notAuth';
+  }
+  final deviceId = base64.encode(utf8.encode((await MobileDeviceIdentifier().getDeviceId())!));
+  String udid = await FlutterUdid.consistentUdid;
+
+  var url = "$BASE_URL/api/log_screenshot?token=$authToken&message=$message&deviceid=$deviceId&udid=$udid";
+  await http.get(Uri.parse(url));
 }

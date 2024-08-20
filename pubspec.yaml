@@ -65,7 +65,8 @@ dependencies:
   win32: ^5.5.4
   flutter_udid: ^2.0.1
   mobile_device_identifier: ^0.0.2
-  screenshot_callback: ^3.0.1
+  screenshot_callback:
+    git: https://github.com/Gaya-Communities/flutter_screenshot_callback
 
 dev_dependencies:
   flutter_test:
