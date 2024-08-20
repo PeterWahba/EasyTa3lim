@@ -25,6 +25,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   dynamic courseAccessibility;
+  late ScreenshotCallback screenshotCallback;
 
   void callInitScreenShotCallBack() async {
     await initScreenshotCallback();
@@ -32,10 +33,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   //It must be created after permission is granted.
   Future<void> initScreenshotCallback() async {
-    ScreenshotCallback screenshotCallback = ScreenshotCallback();
+    screenshotCallback = ScreenshotCallback();
 
     screenshotCallback.addListener(() async {
-      String msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
+      var msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
       print(msg);
     });
   }
@@ -78,9 +79,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
+    callInitScreenShotCallBack();
     donLogin();
     systemSettings();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    screenshotCallback.dispose();
+    super.dispose();
   }
 
   void donLogin() {
