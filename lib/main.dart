@@ -49,12 +49,10 @@ void main() {
 
     screenshotCallback.addListener(() async {
       var msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
-      print(msg);
       await sendScreenShotLogs(msg);
     });
-    print("CALLBACK INITIALIZED");
   } catch (e) {
-    print(e);
+    // print(e);
   }
   runApp(const MyApp());
 }
