@@ -46,11 +46,11 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Image access required</string>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Image access required</string>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Image access required</string>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
 	<key>NSAllowsArbitraryLoads</key>
   	<true/>
 </dict>
