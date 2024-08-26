@@ -67,6 +67,8 @@ dependencies:
   mobile_device_identifier: ^0.0.2
   screenshot_callback:
     git: https://github.com/Gaya-Communities/flutter_screenshot_callback
+  flutter_widget_from_html: ^0.15.2
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -96,13 +98,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/splash.jpg
-    - assets/images/login_forget.png
-    - assets/images/do_login.png
-    - assets/images/long_arrow_right.png
-    - assets/images/loading_animated.gif
-    - assets/images/play.png
-    - assets/images/no_connection.png
+    - assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -4,6 +4,7 @@ import 'package:academy_app/providers/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 
 import '../constants.dart';
@@ -92,4 +93,39 @@ Future<void> sendScreenShotLogs(String message) async {
 
   var url = "$BASE_URL/api/log_screenshot?token=$authToken&message=$message&deviceid=$deviceId&udid=$udid";
   await http.get(Uri.parse(url));
+}
+
+Future getOfflinePaymentInstructions() async {
+  var url = "$BASE_URL/api/get_payment_instructions";
+  try {
+    var response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
+Future sendOfflinePaymentRequest(int courseId, String? authToken, XFile? image) async {
+  var url = "$BASE_URL/api/initiate_course_offline_payment_mobile";
+  try {
+    var request = http.MultipartRequest('POST', Uri.parse(url));
+    request.fields['auth_token'] = authToken!;
+    request.fields['course_id'] = courseId.toString();
+    request.files.add(await http.MultipartFile.fromPath('payment_document', image!.path));
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      var responseString = await response.stream.bytesToString();
+      var responseJson = json.decode(responseString);
+      return responseJson['validity'];
+    } else {
+      return 'error';
+    }
+  } catch (e) {
+    return 'error';
+  }
 }

@@ -1,26 +1,31 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:academy_app/models/common_functions.dart';
+import 'package:academy_app/providers/misc_provider.dart';
 import 'package:academy_app/providers/shared_pref_helper.dart';
 import 'package:academy_app/widgets/custom_text.dart';
 import 'package:academy_app/widgets/lesson_list_item.dart';
+import 'package:academy_app/widgets/payment_instructions_bottom_sheet.dart';
 import 'package:academy_app/widgets/star_display_widget.dart';
 import 'package:academy_app/widgets/tab_view_details.dart';
 import 'package:academy_app/widgets/util.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../constants.dart';
-import '../widgets/app_bar_two.dart';
 import '../providers/courses.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import '../widgets/app_bar_two.dart';
 import '../widgets/from_network.dart';
 import '../widgets/from_vimeo_id.dart';
 import '../widgets/from_youtube.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   static const routeName = '/course-details';
+
   const CourseDetailScreen({Key? key}) : super(key: key);
 
   @override
@@ -28,8 +33,7 @@ class CourseDetailScreen extends StatefulWidget {
   _CourseDetailScreenState createState() => _CourseDetailScreenState();
 }
 
-class _CourseDetailScreenState extends State<CourseDetailScreen>
-    with SingleTickerProviderStateMixin {
+class _CourseDetailScreenState extends State<CourseDetailScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   var _isInit = true;
@@ -40,6 +44,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   dynamic loadedCourse;
   dynamic courseId;
   int? selected;
+  bool isPaymentDetailsLoading = false;
 
   @override
   void didChangeDependencies() async {
@@ -57,14 +62,10 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
 
       courseId = ModalRoute.of(context)!.settings.arguments as int;
 
-      loadedCourse =
-      Provider.of<Courses>(context, listen: false).findById(courseId);
+      loadedCourse = Provider.of<Courses>(context, listen: false).findById(courseId);
 
-      Provider.of<Courses>(context, listen: false)
-          .fetchCourseDetailById(courseId)
-          .then((_) {
-        loadedCourseDetail =
-            Provider.of<Courses>(context, listen: false).getCourseDetail;
+      Provider.of<Courses>(context, listen: false).fetchCourseDetailById(courseId).then((_) {
+        loadedCourseDetail = Provider.of<Courses>(context, listen: false).getCourseDetail;
         // ignore: unused_local_variable
         // loadedCourse =
         //     Provider.of<Courses>(context, listen: false).findById(courseId);
@@ -77,10 +78,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     super.didChangeDependencies();
   }
 
-  void _launchURL(String url) async => await canLaunch(url)
-      ? await launch(url, forceSafariVC: false)
-      : throw 'Could not launch $url';
-  
+  void _launchURL(String url) async => await canLaunch(url) ? await launch(url, forceSafariVC: false) : throw 'Could not launch $url';
+
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
@@ -114,15 +113,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 alignment: Alignment.center,
-                                height:
-                                    MediaQuery.of(context).size.height / 3.3,
+                                height: MediaQuery.of(context).size.height / 3.3,
                                 decoration: BoxDecoration(
                                     color: Colors.black,
                                     image: DecorationImage(
                                       fit: BoxFit.cover,
-                                      colorFilter: ColorFilter.mode(
-                                          Colors.black.withOpacity(0.6),
-                                          BlendMode.dstATop),
+                                      colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.dstATop),
                                       image: NetworkImage(
                                         loadedCourse!.thumbnail,
                                       ),
@@ -132,47 +128,23 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                             ClipOval(
                               child: InkWell(
                                 onTap: () {
-                                  if (loadedCourse.courseOverviewProvider ==
-                                      'vimeo') {
-                                    String vimeoVideoId = loadedCourse
-                                        .courseOverviewUrl!
-                                        .split('/')
-                                        .last;
+                                  if (loadedCourse.courseOverviewProvider == 'vimeo') {
+                                    String vimeoVideoId = loadedCourse.courseOverviewUrl!.split('/').last;
                                     // _showVimeoModal(context, vimeoVideoId);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PlayVideoFromVimeoId(
-                                                    courseId: loadedCourse.id!,
-                                                    vimeoVideoId:
-                                                        vimeoVideoId)));
-                                  } else if (loadedCourse
-                                          .courseOverviewProvider ==
-                                      'html5') {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => PlayVideoFromVimeoId(courseId: loadedCourse.id!, vimeoVideoId: vimeoVideoId)));
+                                  } else if (loadedCourse.courseOverviewProvider == 'html5') {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              PlayVideoFromNetwork(
-                                                  courseId: loadedCourse.id!,
-                                                  videoUrl: loadedCourse
-                                                      .courseOverviewUrl!)),
+                                      MaterialPageRoute(builder: (context) => PlayVideoFromNetwork(courseId: loadedCourse.id!, videoUrl: loadedCourse.courseOverviewUrl!)),
                                     );
                                   } else {
-                                    if (loadedCourse
-                                        .courseOverviewProvider!.isEmpty) {
-                                      CommonFunctions.showSuccessToast(
-                                          'Video url not provided');
+                                    if (loadedCourse.courseOverviewProvider!.isEmpty) {
+                                      CommonFunctions.showSuccessToast('Video url not provided');
                                     } else {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                PlayVideoFromYoutube(
-                                                    courseId: loadedCourse.id!,
-                                                    videoUrl: loadedCourse
-                                                        .courseOverviewUrl!),
+                                            builder: (context) => PlayVideoFromYoutube(courseId: loadedCourse.id!, videoUrl: loadedCourse.courseOverviewUrl!),
                                           ));
                                     }
                                   }
@@ -204,29 +176,19 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                   child: FloatingActionButton(
                                     onPressed: () {
                                       if (_isAuth) {
-                                        var msg =
-                                            loadedCourseDetail.isWishlisted;
+                                        var msg = loadedCourseDetail.isWishlisted;
                                         showDialog(
                                           context: context,
-                                          builder: (BuildContext context) =>
-                                              buildPopupDialogWishList(
-                                                  context,
-                                                  loadedCourseDetail
-                                                      .isWishlisted,
-                                                  loadedCourse.id,
-                                                  msg),
+                                          builder: (BuildContext context) => buildPopupDialogWishList(context, loadedCourseDetail.isWishlisted, loadedCourse.id, msg),
                                         );
                                       } else {
-                                        CommonFunctions.showSuccessToast(
-                                            'Please login first');
+                                        CommonFunctions.showSuccessToast('Please login first');
                                       }
                                     },
                                     tooltip: 'Wishlist',
                                     backgroundColor: kPrimaryColor,
                                     child: Icon(
-                                      loadedCourseDetail.isWishlisted!
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
+                                      loadedCourseDetail.isWishlisted! ? Icons.favorite : Icons.favorite_border,
                                       size: 30,
                                       color: Colors.white,
                                     ),
@@ -247,8 +209,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                 textAlign: TextAlign.left,
                                 text: TextSpan(
                                   text: loadedCourse.title,
-                                  style: const TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                  style: const TextStyle(fontSize: 20, color: Colors.black),
                                 ),
                               ),
                             ),
@@ -260,8 +221,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
@@ -303,8 +263,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                       ),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.only(
-                            right: 15, left: 15, top: 0, bottom: 5),
+                        padding: const EdgeInsets.only(right: 15, left: 15, top: 0, bottom: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
@@ -324,56 +283,73 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                               ),
                               tooltip: 'Share',
                               onPressed: () {
-                                Share.share(
-                                    loadedCourse.shareableLink.toString());
+                                Share.share(loadedCourse.shareableLink.toString());
                               },
                             ),
-                            MaterialButton(
-                              onPressed: () async {
-                                _authToken = await SharedPreferenceHelper()
-                                    .getAuthToken();
-                                if (!loadedCourseDetail.isPurchased!) {
-                                  if (_authToken != null) {
-                                    if (loadedCourse.isFreeCourse == '1') {
-                                      // final _url = BASE_URL + '/api/enroll_free_course?course_id=$courseId&auth_token=$_authToken';
-                                      Provider.of<Courses>(context,
-                                              listen: false)
-                                          .getEnrolled(courseId)
-                                          .then((_) =>
-                                              CommonFunctions.showSuccessToast(
-                                                  'Enrolled Successfully'));
-                                    } else {
-                                      final url =
-                                          '$BASE_URL/api/web_redirect_to_buy_course/$_authToken/$courseId/academybycreativeitem';
-                                      _launchURL(url);
-                                    }
-                                  } else {
-                                    CommonFunctions.showSuccessToast(
-                                        'Please login first');
-                                  }
-                                }
-                              },
-                              color: loadedCourseDetail.isPurchased!
-                                  ? kGreenPurchaseColor
-                                  : kPrimaryColor,
-                              textColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              splashColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(7.0),
-                                // side: BorderSide(color: kBlueColor),
-                              ),
-                              child: Text(
-                                loadedCourseDetail.isPurchased!
-                                    ? 'Purchased'
-                                    : loadedCourse.isFreeCourse == '1'
-                                        ? 'Get Enroll'
-                                        : 'Buy Now',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w400, fontSize: 16),
-                              ),
-                            ),
+                            isPaymentDetailsLoading
+                                ? CircularProgressIndicator()
+                                : MaterialButton(
+                                    onPressed: () async {
+                                      _authToken = await SharedPreferenceHelper().getAuthToken();
+                                      if (!loadedCourseDetail.isPurchased!) {
+                                        if (_authToken != null) {
+                                          if (loadedCourse.isFreeCourse == '1') {
+                                            // final _url = BASE_URL + '/api/enroll_free_course?course_id=$courseId&auth_token=$_authToken';
+                                            Provider.of<Courses>(context, listen: false).getEnrolled(courseId).then((_) => CommonFunctions.showSuccessToast('Enrolled Successfully'));
+                                          } else {
+                                            // final url = '$BASE_URL/api/web_redirect_to_buy_course/$_authToken/$courseId/academybycreativeitem';
+                                            // _launchURL(url);
+                                            // get payment details string from bakend
+                                            setState(() {
+                                              isPaymentDetailsLoading = true;
+                                            });
+                                            var paymentInstructions = await getOfflinePaymentInstructions();
+                                            setState(() {
+                                              isPaymentDetailsLoading = false;
+                                            });
+                                            if (paymentInstructions == null) {
+                                              Fluttertoast.showToast(msg: 'Error Occurred!');
+                                              return;
+                                            }
+                                            showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              isDismissible: true,
+                                              enableDrag: true,
+                                              useSafeArea: true,
+                                              context: context,
+                                              builder: (context) {
+                                                return PaymentInstructionsBottomSheet(
+                                                  context: context,
+                                                  coursePrice: loadedCourse.price.toString(),
+                                                  paymentInstructions: paymentInstructions,
+                                                  courseId: courseId,
+                                                  authToken: _authToken,
+                                                );
+                                              },
+                                            );
+                                          }
+                                        } else {
+                                          CommonFunctions.showSuccessToast('Please login first');
+                                        }
+                                      }
+                                    },
+                                    color: loadedCourseDetail.isPurchased! ? kGreenPurchaseColor : kPrimaryColor,
+                                    textColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    splashColor: Colors.blueAccent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(7.0),
+                                      // side: BorderSide(color: kBlueColor),
+                                    ),
+                                    child: Text(
+                                      loadedCourseDetail.isPurchased!
+                                          ? 'Purchased'
+                                          : loadedCourse.isFreeCourse == '1'
+                                              ? 'Get Enroll'
+                                              : 'Buy Now',
+                                      style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+                                    ),
+                                  ),
                           ],
                         ),
                       ),
@@ -382,8 +358,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               child: Card(
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
@@ -396,10 +371,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                       child: TabBar(
                                         controller: _tabController,
                                         indicatorSize: TabBarIndicatorSize.tab,
-                                        indicator: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: kPrimaryColor),
+                                        indicator: BoxDecoration(borderRadius: BorderRadius.circular(10), color: kPrimaryColor),
                                         unselectedLabelColor: kTextColor,
                                         padding: const EdgeInsets.all(10),
                                         labelColor: Colors.white,
@@ -443,28 +415,21 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                     Container(
                                       width: double.infinity,
                                       height: 300,
-                                      padding: const EdgeInsets.only(
-                                          right: 10,
-                                          left: 10,
-                                          top: 0,
-                                          bottom: 10),
+                                      padding: const EdgeInsets.only(right: 10, left: 10, top: 0, bottom: 10),
                                       child: TabBarView(
                                         controller: _tabController,
                                         children: [
                                           TabViewDetails(
                                             titleText: 'What is Included',
-                                            listText: loadedCourseDetail
-                                                .courseIncludes,
+                                            listText: loadedCourseDetail.courseIncludes,
                                           ),
                                           TabViewDetails(
                                             titleText: 'What you will learn',
-                                            listText: loadedCourseDetail
-                                                .courseOutcomes,
+                                            listText: loadedCourseDetail.courseOutcomes,
                                           ),
                                           TabViewDetails(
                                             titleText: 'Course Requirements',
-                                            listText: loadedCourseDetail
-                                                .courseRequirements,
+                                            listText: loadedCourseDetail.courseRequirements,
                                           ),
                                         ],
                                       ),
@@ -474,8 +439,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                               ),
                             ),
                             const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
+                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                               child: CustomText(
                                 text: 'Course Curriculum',
                                 fontSize: 20,
@@ -484,21 +448,20 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
                               child: ListView.builder(
-                                key: Key(
-                                    'builder ${selected.toString()}'), //attention
+                                key: Key('builder ${selected.toString()}'),
+                                //attention
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: loadedCourseDetail.mSection!.length,
                                 itemBuilder: (ctx, index) {
-                                  final section =
-                                      loadedCourseDetail.mSection![index];
+                                  final section = loadedCourseDetail.mSection![index];
                                   return Card(
                                     elevation: 0.3,
                                     child: ExpansionTile(
-                                      key: Key(index.toString()), //attention
+                                      key: Key(index.toString()),
+                                      //attention
                                       initiallyExpanded: index == selected,
                                       onExpansionChanged: ((newState) {
                                         if (newState) {
@@ -510,21 +473,19 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                             selected = -1;
                                           });
                                         }
-                                      }), //attention
+                                      }),
+                                      //attention
                                       title: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Align(
                                             alignment: Alignment.centerLeft,
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                              padding: const EdgeInsets.symmetric(
                                                 vertical: 5.0,
                                               ),
                                               child: CustomText(
-                                                text: HtmlUnescape().convert(
-                                                    section.title.toString()),
+                                                text: HtmlUnescape().convert(section.title.toString()),
                                                 colors: kDarkGreyColor,
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w400,
@@ -532,8 +493,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5.0),
+                                            padding: const EdgeInsets.symmetric(vertical: 5.0),
                                             child: Row(
                                               children: [
                                                 Expanded(
@@ -541,20 +501,15 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color: kTimeBackColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              3),
+                                                      borderRadius: BorderRadius.circular(3),
                                                     ),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
+                                                    padding: const EdgeInsets.symmetric(
                                                       vertical: 5.0,
                                                     ),
                                                     child: Align(
-                                                      alignment:
-                                                          Alignment.center,
+                                                      alignment: Alignment.center,
                                                       child: CustomText(
-                                                        text: section
-                                                            .totalDuration,
+                                                        text: section.totalDuration,
                                                         fontSize: 10,
                                                         colors: kTimeColor,
                                                       ),
@@ -569,39 +524,28 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                                   child: Container(
                                                     decoration: BoxDecoration(
                                                       color: kLessonBackColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              3),
+                                                      borderRadius: BorderRadius.circular(3),
                                                     ),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
+                                                    padding: const EdgeInsets.symmetric(
                                                       vertical: 5.0,
                                                     ),
                                                     child: Align(
-                                                      alignment:
-                                                          Alignment.center,
+                                                      alignment: Alignment.center,
                                                       child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color:
-                                                              kLessonBackColor,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(3),
+                                                        decoration: BoxDecoration(
+                                                          color: kLessonBackColor,
+                                                          borderRadius: BorderRadius.circular(3),
                                                         ),
                                                         child: CustomText(
-                                                          text:
-                                                              '${section.mLesson!.length} Lessons',
+                                                          text: '${section.mLesson!.length} Lessons',
                                                           fontSize: 10,
-                                                          colors:
-                                                              kDarkGreyColor,
+                                                          colors: kDarkGreyColor,
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                                const Expanded(
-                                                    flex: 2, child: Text("")),
+                                                const Expanded(flex: 2, child: Text("")),
                                               ],
                                             ),
                                           ),
@@ -610,13 +554,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                                       children: [
                                         ListView.builder(
                                           shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
+                                          physics: const NeverScrollableScrollPhysics(),
                                           itemBuilder: (ctx, index) {
                                             return LessonListItem(
                                               lesson: section.mLesson![index],
-                                              courseId:
-                                                  loadedCourseDetail.courseId!,
+                                              courseId: loadedCourseDetail.courseId!,
                                             );
                                           },
                                           itemCount: section.mLesson!.length,
