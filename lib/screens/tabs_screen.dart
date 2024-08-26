@@ -1,14 +1,17 @@
 import 'dart:convert';
+
 import 'package:academy_app/constants.dart';
 import 'package:academy_app/widgets/app_bar.dart';
 import 'package:academy_app/widgets/filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 import 'account_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
-import 'my_wishlist_screen.dart';
 import 'my_courses_screen.dart';
+import 'my_wishlist_screen.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -101,11 +104,29 @@ class _TabsScreenState extends State<TabsScreen> {
       backgroundColor: kBackgroundColor,
       appBar: const CustomAppBar(),
       body: _pages[_selectedPageIndex],
-      floatingActionButton: _selectedPageIndex != 3 ? FloatingActionButton(
-        onPressed: () => _showFilterModal(context),
-        backgroundColor: kDarkButtonBg,
-        child: const Icon(Icons.filter_list),
-      ) : null,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _selectedPageIndex != 3
+              ? FloatingActionButton(
+                  onPressed: () => _showFilterModal(context),
+                  backgroundColor: kDarkButtonBg,
+                  child: const Icon(Icons.filter_list),
+                )
+              : SizedBox(
+                  height: 0,
+                ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () {
+              // launch support whatsapp link
+              launchUrlString('https://wa.me/201553782250');
+            },
+            child: const Icon(Icons.contact_support_rounded),
+            backgroundColor: kPrimaryColor,
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectPage,
         items: const [
