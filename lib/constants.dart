@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names
 import 'package:flutter/material.dart';
 
-// const BASE_URL = 'https://easyta3lim.com';
-const BASE_URL = 'http://10.0.0.3/easyta3lim';
+const BASE_URL = 'https://easyta3lim.com';
+// const BASE_URL = 'http://10.0.0.3/easyta3lim';
 
 // list of colors that we use in our app
 const kBackgroundColor = Color(0xFFF5F9FA);
