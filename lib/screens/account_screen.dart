@@ -114,10 +114,10 @@ class _AccountScreenState extends State<AccountScreen> {
     });
   }
 
-  Color _getTextColor(Set<MaterialState> states) => states.any(<MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
+  Color _getTextColor(Set<WidgetState> states) => states.any(<WidgetState>{
+        WidgetState.pressed,
+        WidgetState.hovered,
+        WidgetState.focused,
       }.contains)
           ? Colors.green
           : kPrimaryColor;
@@ -170,7 +170,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               },
                               style: ButtonStyle(
                                   backgroundColor:
-                                      MaterialStateColor.resolveWith(
+                                      WidgetStateColor.resolveWith(
                                           _getTextColor)),
                               icon: const Icon(Icons.download_done_rounded),
                               label: const Text(

@@ -10,7 +10,6 @@ import 'package:academy_app/screens/edit_profile_screen.dart';
 import 'package:academy_app/screens/sub_category_screen.dart';
 import 'package:academy_app/screens/verification_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
@@ -45,12 +44,12 @@ void main() {
   });
   HttpOverrides.global = PostHttpOverrides();
   try {
-    screenshotCallback = ScreenshotCallback();
+    // screenshotCallback = ScreenshotCallback();
 
-    screenshotCallback.addListener(() async {
-      var msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
-      await sendScreenShotLogs(msg);
-    });
+    // screenshotCallback.addListener(() async {
+    //   var msg = 'screenshot at ${DateFormat('yyyy-MM-dd–kk:mm').format(DateTime.now())}';
+    //   await sendScreenShotLogs(msg);
+    // });
   } catch (e) {
     // print(e);
   }

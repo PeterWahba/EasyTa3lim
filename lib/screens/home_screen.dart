@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                           MaterialButton(
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.of(context).pushNamed(
                                 CoursesScreen.routeName,
                                 arguments: {
