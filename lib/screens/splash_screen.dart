@@ -12,6 +12,7 @@ import 'package:mobile_device_identifier/mobile_device_identifier.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/shared_pref_helper.dart';
+import 'splash/ui/screens/splash_screen.dart';
 import 'tabs_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -45,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (authToken == null || authToken.isEmpty) {
       return;
     }
-    final deviceId = base64.encode(utf8.encode((await MobileDeviceIdentifier().getDeviceId())!));
+    // final deviceId = base64.encode(utf8.encode((await MobileDeviceIdentifier().getDeviceId())!));
     String udid = await FlutterUdid.consistentUdid;
 
     var url = "$BASE_URL/api/device_binding?token=$authToken";
@@ -53,15 +54,16 @@ class _SplashScreenState extends State<SplashScreen> {
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
       // compare the device id and udid with the data from the server
-      if (data['deviceid'] != deviceId || data['udid'] != udid) {
-        // if the device id and udid are not the same, log out the user
-        await Provider.of<Auth>(context, listen: false).logout();
-      }
+      // if (data['deviceid'] != deviceId || data['udid'] != udid) {
+      //   // if the device id and udid are not the same, log out the user
+      //   await Provider.of<Auth>(context, listen: false).logout();
+      // }
     }
   }
 
   @override
-  void initState() {
+  void initState()  {
+
     donLogin();
     systemSettings();
     super.initState();
@@ -74,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void donLogin() {
     String? token;
-    Future.delayed(const Duration(seconds: 3), () async {
+    Future.delayed(const Duration(seconds: 6), () async {
       await checkDeviceBinding();
       token = await SharedPreferenceHelper().getAuthToken();
       if (token != null && token!.isNotEmpty) {
@@ -94,16 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackgroundColor,
-      body: Center(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          width: double.infinity,
-          child: Image.asset(
-            'assets/images/splash.jpg',
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
+      body: Center(child: AnimationSplashScreen()),
     );
   }
 }

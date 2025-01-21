@@ -76,6 +76,7 @@ class MyCourses with ChangeNotifier {
 
   Future<void> fetchCourseSections(int courseId) async {
     final authToken = await SharedPreferenceHelper().getAuthToken();
+    
     var url =
         '$BASE_URL/api/sections?auth_token=$authToken&course_id=$courseId';
 
@@ -85,7 +86,6 @@ class MyCourses with ChangeNotifier {
       if (extractedData.isEmpty) {
         return;
       }
-
       final List<Section> loadedSections = [];
       for (var sectionData in extractedData) {
         loadedSections.add(Section(

@@ -1,6 +1,6 @@
 import 'package:academy_app/providers/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pod_player/pod_player.dart';
+import 'package:video_player/video_player.dart';
 import 'package:provider/provider.dart';
 
 import '../constants.dart';
@@ -13,34 +13,21 @@ class PlayVideoFromAsset extends StatefulWidget {
 }
 
 class _PlayVideoFromAssetState extends State<PlayVideoFromAsset> {
-  late final PodPlayerController controller;
+  late VideoPlayerController _controller;
 
   @override
   void initState() {
-    controller = PodPlayerController(
-        playVideoFrom: PlayVideoFrom.asset('assets/SampleVideo_720x480_20mb.mp4'),
-        watermark: Consumer<Auth>(builder: (context, authData, child) {
-          final user = authData.user;
-          return Center(
-              child: Transform.rotate(
-                  angle: -0.45,
-                  child: IgnorePointer(
-                      child: Opacity(
-                          opacity: 0.2,
-                          child: Text(
-                            overflow: TextOverflow.ellipsis,
-                            user.email!,
-                            style: TextStyle(color: Colors.grey, fontSize: 60, fontWeight: FontWeight.w400),
-                            textAlign: TextAlign.center,
-                          )))));
-        }))
-      ..initialise();
     super.initState();
+    _controller = VideoPlayerController.asset('assets/SampleVideo_720x480_20mb.mp4')
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.play();
+      });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -56,23 +43,50 @@ class _PlayVideoFromAssetState extends State<PlayVideoFromAsset> {
       ),
       backgroundColor: kBackgroundColor,
       body: Center(
-        child: PodVideoPlayer(
-          controller: controller,
-          podPlayerLabels: const PodPlayerLabels(
-            play: "PLAY",
-            pause: "PAUSE",
-            error: "ERROR WHILE TRYING TO PLAY VIDEO",
-            exitFullScreen: "EXIT FULL SCREEN",
-            fullscreen: "FULL SCREEN",
-            loopVideo: "LOOP VIDEO",
-            mute: "MUTE",
-            playbackSpeed: "PLAYBACK SPEED",
-            settings: "SETTINGS",
-            unmute: "UNMUTE",
-            optionEnabled: "YES",
-            optionDisabled: "NO",
-            quality: "QUALITY",
-          ),
+        child: _controller.value.isInitialized
+            ? Stack(
+                alignment: Alignment.center,
+                children: [
+                  AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  ),
+                  Consumer<Auth>(
+                    builder: (context, authData, child) {
+                      final user = authData.user;
+                      return Transform.rotate(
+                        angle: -0.45,
+                        child: IgnorePointer(
+                          child: Opacity(
+                            opacity: 0.2,
+                            child: Text(
+                              user.email!,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 60,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              )
+            : CircularProgressIndicator(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _controller.value.isPlaying
+                ? _controller.pause()
+                : _controller.play();
+          });
+        },
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
       ),
     );

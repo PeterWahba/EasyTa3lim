@@ -2,8 +2,10 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:academy_app/core/notifcations/firebase_messaging_service.dart';
 import 'package:academy_app/providers/bundles.dart';
 import 'package:academy_app/widgets/bundle_grid.dart';
+import '../core/notifcations/push_notifcation_service.dart';
 import '../providers/categories.dart';
 import '../widgets/category_list_item.dart';
 import '../widgets/course_grid.dart';
@@ -200,7 +202,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.all(0),
                             child: Row(
                               children: [
-                                const Text('All courses'),
+
+                              
+                                Column(
+                                  children: [
+                                    const Text('All courses'),
+                                    
+                                  ],
+                                ),
                                 Icon(
                                   Icons.arrow_forward_ios_rounded,
                                   color: kPrimaryColor.withOpacity(0.7),

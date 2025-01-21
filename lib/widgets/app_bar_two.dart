@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:academy_app/models/app_logo.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
+import '../core/notifcations/push_notifcation_service.dart';
 
 class CustomAppBarTwo extends StatefulWidget implements PreferredSizeWidget {
   @override
@@ -50,6 +51,11 @@ class _CustomAppBarTwoState extends State<CustomAppBarTwo> {
       iconTheme: const IconThemeData(
         color: kSecondaryColor, //change your color here
       ),
+      // actions: [
+      //     IconButton(onPressed: () async{
+      //        await PushNotifcationService.sendTopicNotification(topic: 'users_notifcations', title: 'title', body: 'الوقتي في عرض خش شوفه',);
+      //     }, icon: Icon(Icons.send),),
+      // ],
       title: StreamBuilder<AppLogo>(
         stream: _controller.stream,
         builder: (context, snapshot) {

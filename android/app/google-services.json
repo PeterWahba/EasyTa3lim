@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "528436156653",
+    "project_id": "easyta3lim",
+    "storage_bucket": "easyta3lim.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528436156653:android:f148f51c2d142ef50dd4e4",
+        "android_client_info": {
+          "package_name": "com.ta3lim.academy_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSVSLsq-dTv4XYkzS-KHIV2X8BVLgHDM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

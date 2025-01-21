@@ -1,15 +1,16 @@
 // ignore_for_file: constant_identifier_names, camel_case_types
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/helpers/shared_pref_constans.dart';
+import '../core/helpers/shared_pref_helper.dart';
+
 class SharedPreferenceHelper {
-  Future<bool> setAuthToken(String token) async {
-    final pref = await SharedPreferences.getInstance();
-    return pref.setString(userPref.AuthToken.toString(), token);
+  Future<void> setAuthToken(String token) async {
+    return await SharedPrefHelper.setSecuredString(SharedPrefKeys.userToken, token);
   }
 
   Future<String?> getAuthToken() async {
-    final pref = await SharedPreferences.getInstance();
-    return pref.getString(userPref.AuthToken.toString());
+    return await SharedPrefHelper.getSecuredString(SharedPrefKeys.userToken);
   }
 
   // Future<bool> setUserData(String userData) async {

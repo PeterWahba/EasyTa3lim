@@ -3,12 +3,16 @@ import 'package:academy_app/constants.dart';
 import 'package:academy_app/models/common_functions.dart';
 import 'package:academy_app/models/section_db_model.dart';
 import 'package:academy_app/models/video_db_model.dart';
+import 'package:academy_app/providers/auth.dart';
 import 'package:academy_app/providers/database_helper.dart';
 import 'package:academy_app/widgets/custom_text.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:pod_player/pod_player.dart';
+import 'package:provider/provider.dart';
 import 'downloaded_course_list.dart';
 
 class DownloadListScreen extends StatefulWidget {
@@ -183,7 +187,7 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                                         children: <Widget>[
                                           InkWell(
                                             onTap: () {
-                                              setState(() async {
+                                              // setState(()  {
                                                 path =
                                                     '${getVideo.path}/${getVideo.title}';
                                                 // path = '/storage/emulated/0/Download/Youtube Downloadermp4';
@@ -202,7 +206,7 @@ class _DownloadListScreenState extends State<DownloadListScreen> {
                                                 // var val = await DatabaseHelper.instance
                                                 //     .courseExists(video.courseId);
                                                 // print(val);
-                                              });
+                                              // });
                                             },
                                             child: Container(
                                               padding:
@@ -347,26 +351,71 @@ class VideoApp extends StatefulWidget {
   final File? file;
 
   const VideoApp({Key? key, this.file}) : super(key: key);
+
   @override
-  // ignore: library_private_types_in_public_api
   _VideoAppState createState() => _VideoAppState();
 }
 
 class _VideoAppState extends State<VideoApp> {
-  late final PodPlayerController controller;
+  late final PodPlayerController _controller;
+  late VideoPlayerController _videoPlayerController;
+  late ChewieController _chewieController;
+
   @override
   void initState() {
-    controller = PodPlayerController(
-      playVideoFrom: PlayVideoFrom.file(widget.file!),
-    )..initialise();
+      super.initState();
+        _controller = PodPlayerController(
+        playVideoFrom: PlayVideoFrom.file(
+         widget.file!,
+        ),
+        watermark:Center(child: _buildWatermark()))
+      ..initialise();
+
+      _initializeVideoPlayer();
     super.initState();
+
+  }
+  void _initializeVideoPlayer() {
+    _videoPlayerController = VideoPlayerController.file(widget.file!);
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: true,  
+      allowPlaybackSpeedChanging: true,
+      allowMuting: true,
+      zoomAndPan: false,
+      overlay: Center(child: _buildWatermark()),
+    );
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose(); 
     super.dispose();
   }
+  
+  Widget _buildWatermark() {
+    return Consumer<Auth>(
+      builder: (context, authData, child) {
+        final user = authData.user;
+        return IgnorePointer(
+          child: Opacity(
+            opacity: 0.3,
+            child: Text(
+              user.email ?? '',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 60,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      },
+    );}
+  bool isServerOne = true;
 
   @override
   Widget build(BuildContext context) {
@@ -379,26 +428,67 @@ class _VideoAppState extends State<VideoApp> {
         ),
       ),
       backgroundColor: kBackgroundColor,
-      body: Center(
-        child: PodVideoPlayer(
-          controller: controller,
-          podPlayerLabels: const PodPlayerLabels(
-            play: "PLAY",
-            pause: "PAUSE",
-            error: "ERROR WHILE TRYING TO PLAY VIDEO",
-            exitFullScreen: "EXIT FULL SCREEN",
-            fullscreen: "FULL SCREEN",
-            loopVideo: "LOOP VIDEO",
-            mute: "MUTE",
-            playbackSpeed: "PLAYBACK SPEED",
-            settings: "SETTINGS",
-            unmute: "UNMUTE",
-            optionEnabled: "YES",
-            optionDisabled: "NO",
-            quality: "QUALITY",
+      body:ListView(
+        shrinkWrap: true,
+        padding: EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+        children: [
+           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              InkWell(
+                  onTap: (){
+                  setState(() {
+                    isServerOne = true;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: isServerOne ?Colors.blue : Colors.blueGrey,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Server One' ,  style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ),
+              SizedBox(width: 30,),
+              InkWell(
+                onTap: (){
+                  setState(() {
+                    isServerOne = false;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: isServerOne ? Colors.blueGrey : Colors.blue,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Server Two' , style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ),
+          SizedBox(height: 30,),
+          isServerOne ?  PodVideoPlayer(
+            controller: _controller,
+            podProgressBarConfig: const PodProgressBarConfig(
+              padding: kIsWeb
+                  ? EdgeInsets.zero
+                  : EdgeInsets.only(
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                    ),
+              playingBarColor: Colors.blue,
+              circleHandlerColor: Colors.blue,
+              backgroundColor: Colors.blueGrey,
+            ),):AspectRatio( aspectRatio: 16/9,child: Chewie(controller: _chewieController)),
+        ],
+      )
     );
   }
 }

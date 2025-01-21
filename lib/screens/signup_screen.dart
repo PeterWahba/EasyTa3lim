@@ -69,6 +69,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _isLoading = true;
     });
     try {
+      // debugPrint('password =================== ${_firstNameController.text}');
+      //       debugPrint('password =================== ${_lastNameController.text}');
+
+      // debugPrint('password =================== ${_emailController.text}');
+      // debugPrint('password =================== ${_passwordController.text}');
+
       final UpdateUserModel user = await signUp(_firstNameController.text, _lastNameController.text, _emailController.text, _passwordController.text);
 
       if (user.message == 'Device ID already exists') {
@@ -91,7 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } catch (error) {
       const errorMsg = 'Could not register!';
-      // print(error);
+      debugPrint(error.toString());
       CommonFunctions.showErrorDialog(errorMsg, context);
     }
     setState(() {

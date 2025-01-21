@@ -96,6 +96,8 @@ class _AuthScreenState extends State<AuthScreen> {
       _isLoading = true;
     });
 
+
+    debugPrint(_authData['password'].toString());  
     await Provider.of<Auth>(context, listen: false)
         .login(
       _authData['email'].toString(),
