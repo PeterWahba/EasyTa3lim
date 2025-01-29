@@ -43,25 +43,15 @@
     </array>
     <key>UIRequiresFullScreen</key>
     <true/>
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
-    <key>NSCameraUsageDescription</key>
-    <string>EasyTa3lim needs access to your camera for capturing profile pictures.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>EasyTa3lim needs microphone access for voice recordings.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>EasyTa3lim needs access to your photo library to upload profile pictures.</string>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>processing</string>
-    </array>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>EasyTa3lim Needs Access to your images so that you can add a profile picture</string>
+	<key>NSAllowsArbitraryLoads</key>
+  	<true/>
 </dict>
 </plist>
